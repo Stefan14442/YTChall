@@ -110,5 +110,13 @@ def index():
 
     return render_template("index.html", error=error, result=result)
 
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
