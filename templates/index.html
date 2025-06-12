@@ -1,29 +1,56 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Free YouTube earnings calculator. Estimate your channel's monthly revenue based on views, CPM and monetization percentage.">
   <title>YouTube Earnings Estimator</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body { padding:2rem; }
     .toggle { position:fixed; top:1rem; right:1rem; }
     .thumb { width:100px; border-radius:8px; }
+    .ad-container { margin: 2rem 0; text-align: center; padding: 1rem; border-radius: 8px; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
   </style>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
+     crossorigin="anonymous"></script>
 </head>
 <body>
   <button class="btn btn-outline-secondary toggle" id="dm">🌙</button>
   <div class="container">
 
-    <h1 class="text-center mb-4">YouTube Channel Earnings</h1>
+    <h1 class="text-center mb-4">YouTube Earnings Calculator</h1>
 
     <!-- 📘 Explanation Section -->
     <div class="alert alert-info">
-      <h5>What is CPM and Monetized Views?</h5>
-      <p><strong>CPM</strong> stands for <em>Cost Per Mille</em> — it’s how much advertisers pay for 1,000 views. It changes based on channel topic, audience, and country. For example, finance channels get higher CPMs than gaming channels.</p>
-      <p><strong>Monetized Views</strong> are the views that actually show ads. Not all views are monetized. Usually 40–80% of views are eligible for ads.</p>
-      <p>This calculator gives an estimate based on those two values. You can adjust them below.</p>
+      <h5>How YouTube Earnings Work</h5>
+      <p><strong>CPM</strong> stands for <em>Cost Per Mille</em> — how much advertisers pay per 1,000 views. It varies by:</p>
+      <ul class="mb-3">
+        <li><strong>Niche:</strong> Finance ($5-$15) vs Gaming ($1-$3)</li>
+        <li><strong>Audience:</strong> US/UK viewers pay more</li>
+        <li><strong>Content:</strong> Advertiser-friendly videos earn more</li>
+      </ul>
+      <p class="mb-0"><strong>Formula:</strong> Earnings = (Views × Monetized %) × (CPM ÷ 1000)</p>
     </div>
 
+    <!-- First Ad Unit -->
+    <div class="ad-container">
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
+           crossorigin="anonymous"></script>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-7910139560039697"
+           data-ad-slot="1234567890"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <!-- Calculator Form -->
     <form method="POST" class="card p-4 mb-4 shadow-sm">
       <input type="text" name="channel_url" class="form-control mb-3"
              placeholder="Channel URL (e.g. https://www.youtube.com/@MrBeast)" required />
@@ -39,7 +66,7 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Estimate</button>
+      <button type="submit" class="btn btn-primary">Estimate Earnings</button>
     </form>
 
     {% if error %}
@@ -47,6 +74,21 @@
     {% endif %}
 
     {% if result %}
+      <!-- Second Ad Unit -->
+      <div class="ad-container">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
+             crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7910139560039697"
+             data-ad-slot="0987654321"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+
       <div class="card p-4 shadow-sm mb-4">
         <div class="d-flex align-items-center mb-3">
           <img src="{{ result.thumb }}" alt="" class="thumb me-3" />
@@ -89,6 +131,15 @@
       </div>
       {% endif %}
     {% endif %}
+
+    <!-- Footer with required links -->
+    <footer class="text-center text-muted">
+      <small>
+        <a href="/privacy">Privacy Policy</a> |
+        <a href="/terms">Terms of Service</a>
+      </small>
+      <p class="mt-2"><small>© 2024 YouTube Earnings Estimator</small></p>
+    </footer>
 
   </div>
 
