@@ -1,162 +1,153 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Free YouTube earnings calculator. Estimate your channel's monthly revenue based on views, CPM and monetization percentage.">
-  <title>YouTube Earnings Estimator</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body { padding:2rem; }
-    .toggle { position:fixed; top:1rem; right:1rem; }
-    .thumb { width:100px; border-radius:8px; }
-    .ad-container { margin: 2rem 0; text-align: center; padding: 1rem; border-radius: 8px; }
-    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estimate potential YouTube earnings based on channel statistics and CPM rates">
+  <title>{{ site_name }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% if ga_tracking_id %}
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ ga_tracking_id }}');
+  </script>
+  {% endif %}
   <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+    crossorigin="anonymous"></script>
 </head>
 <body>
-  <button class="btn btn-outline-secondary toggle" id="dm">🌙</button>
-  <div class="container">
-
-    <h1 class="text-center mb-4">YouTube Earnings Calculator</h1>
-
-    <!-- 📘 Explanation Section -->
-    <div class="alert alert-info">
-      <h5>How YouTube Earnings Work</h5>
-      <p><strong>CPM</strong> stands for <em>Cost Per Mille</em> — how much advertisers pay per 1,000 views. It varies by:</p>
-      <ul class="mb-3">
-        <li><strong>Niche:</strong> Finance ($5-$15) vs Gaming ($1-$3)</li>
-        <li><strong>Audience:</strong> US/UK viewers pay more</li>
-        <li><strong>Content:</strong> Advertiser-friendly videos earn more</li>
-      </ul>
-      <p class="mb-0"><strong>Formula:</strong> Earnings = (Views × Monetized %) × (CPM ÷ 1000)</p>
+  <header class="header">
+    <div class="container">
+      <h1><i class="fab fa-youtube"></i> {{ site_name }}</h1>
+      <p class="subtitle">Estimate how much money a YouTube channel makes</p>
     </div>
+  </header>
 
-    <!-- First Ad Unit -->
-    <div class="ad-container">
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
-           crossorigin="anonymous"></script>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-7910139560039697"
-           data-ad-slot="1234567890"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-
-    <!-- Calculator Form -->
-    <form method="POST" class="card p-4 mb-4 shadow-sm">
-      <input type="text" name="channel_url" class="form-control mb-3"
-             placeholder="Channel URL (e.g. https://www.youtube.com/@MrBeast)" required />
-
-      <div class="row g-2 mb-3">
-        <div class="col-md">
-          <input type="text" name="custom_cpm" class="form-control"
-                 placeholder="Custom CPM (optional, e.g. 3.5)" />
+  <main class="container">
+    <div class="card">
+      <form method="POST" class="estimator-form">
+        <div class="form-group">
+          <label for="channel_url"><i class="fas fa-link"></i> YouTube Channel URL</label>
+          <input type="url" id="channel_url" name="channel_url" placeholder="https://www.youtube.com/channel/..." required>
+          <small class="help-text">Paste any YouTube channel URL (channel, @handle, or user)</small>
         </div>
-        <div class="col-md">
-          <input type="number" name="monetized_pct" class="form-control"
-                 value="80" placeholder="Monetized % (e.g. 80)" min="0" max="100" />
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="custom_cpm"><i class="fas fa-dollar-sign"></i> Custom CPM (optional)</label>
+            <input type="number" step="0.01" id="custom_cpm" name="custom_cpm" placeholder="{{ default_cpm }}" value="{{ request.form.custom_cpm or default_cpm }}">
+            <small class="help-text">$1-$10 is typical (Cost Per 1000 views)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="monetized_pct"><i class="fas fa-percentage"></i> Monetized %</label>
+            <input type="number" min="0" max="100" id="monetized_pct" name="monetized_pct" value="{{ request.form.monetized_pct or default_monetized_pct }}">
+            <small class="help-text">% of views that are monetized</small>
+          </div>
         </div>
-      </div>
 
-      <button type="submit" class="btn btn-primary">Estimate Earnings</button>
-    </form>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-calculator"></i> Calculate Earnings
+        </button>
+      </form>
 
-    {% if error %}
-      <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-
-    {% if result %}
-      <!-- Second Ad Unit -->
-      <div class="ad-container">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7910139560039697"
-             crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7910139560039697"
-             data-ad-slot="0987654321"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-      </div>
-
-      <div class="card p-4 shadow-sm mb-4">
-        <div class="d-flex align-items-center mb-3">
-          <img src="{{ result.thumb }}" alt="" class="thumb me-3" />
-          <h3>{{ result.title }}</h3>
+      {% if error %}
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i> {{ error }}
         </div>
-        <p>📊 <strong>Subscribers:</strong> {{ "{:,}".format(result.subs) }}</p>
-        <p>📦 <strong>Total Views:</strong> {{ "{:,}".format(result.total_views) }}</p>
-        <p>🎥 <strong>Video Count:</strong> {{ "{:,}".format(result.vid_count) }}</p>
+      {% endif %}
 
-        <h4>💰 Estimated Monthly Earnings</h4>
-        <div class="alert alert-success">
-          ${{ result.low_earn }} – ${{ result.high_earn }} USD
-        </div>
-        <small class="text-muted">
-          🎯 {{ result.cpm_note }}. Based on monetized views.
-        </small>
-        <small class="d-block mt-2">
-          💡 These are only estimates. Actual earnings depend on audience location, video content, ad type, and engagement.
-        </small>
-      </div>
-
-      {% if result.top_videos %}
-      <div class="card p-4 shadow-sm">
-        <h4>Top 5 Most Viewed Videos</h4>
-        <div class="row">
-          {% for v in result.top_videos %}
-          <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100">
-              <a href="{{ v.url }}" target="_blank">
-                <img src="{{ v.thumbnail }}" class="card-img-top" alt="{{ v.title }}" />
-              </a>
-              <div class="card-body">
-                <p>{{ v.title }}</p>
-                <p>👁️ {{ "{:,}".format(v.views) }} views</p>
-              </div>
+      {% if result %}
+        <div class="result-card">
+          <div class="channel-header">
+            <img src="{{ result.channel.thumbnail }}" alt="{{ result.channel.title }}" class="channel-avatar">
+            <div>
+              <h2>{{ result.channel.title }}</h2>
+              <p class="channel-stats">
+                <span><i class="fas fa-users"></i> {{ result.channel.subscribers|comma }} subs</span>
+                <span><i class="fas fa-play"></i> {{ result.channel.views|comma }} views</span>
+                <span><i class="fas fa-video"></i> {{ result.channel.videos|comma }} videos</span>
+              </p>
             </div>
           </div>
-          {% endfor %}
+
+          <div class="earnings-grid">
+            <div class="earnings-card">
+              <h3>Daily Views</h3>
+              <p class="stat-value">{{ result.daily_views|comma }}</p>
+            </div>
+            <div class="earnings-card">
+              <h3>Monthly Views</h3>
+              <p class="stat-value">{{ result.monthly_views|comma }}</p>
+            </div>
+            <div class="earnings-card highlight">
+              <h3>Monthly Earnings</h3>
+              <p class="stat-value">{{ result.earnings|money }}</p>
+            </div>
+            <div class="earnings-card">
+              <h3>Yearly Earnings</h3>
+              <p class="stat-value">{{ result.yearly_earnings|money }}</p>
+            </div>
+          </div>
+
+          <div class="calculation-note">
+            <p><i class="fas fa-info-circle"></i> Estimates based on ${{ result.cpm }} CPM and {{ result.monetized_pct }}% monetization.</p>
+            <p>Channel created: {{ result.channel.published }}</p>
+          </div>
+
+          <!-- AdSense ad unit -->
+          <div class="ad-container">
+            <ins class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+              data-ad-slot="XXXXXXXXXX"
+              data-ad-format="auto"
+              data-full-width-responsive="true"></ins>
+            <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="info-section">
+      <h2><i class="fas fa-question-circle"></i> How It Works</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <i class="fas fa-chart-line"></i>
+          <h3>View Analysis</h3>
+          <p>We calculate average daily views by dividing total views by video count.</p>
+        </div>
+        <div class="info-card">
+          <i class="fas fa-calculator"></i>
+          <h3>Earnings Formula</h3>
+          <p>(Monthly Views × Monetized %) ÷ 1000 × CPM = Estimated Earnings</p>
+        </div>
+        <div class="info-card">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Disclaimer</h3>
+          <p>These are estimates only. Actual earnings vary based on many factors.</p>
         </div>
       </div>
-      {% endif %}
-    {% endif %}
+    </div>
+  </main>
 
-    <!-- Footer with required links -->
-    <footer class="text-center text-muted">
-      <small>
-        <a href="/privacy">Privacy Policy</a> |
-        <a href="/terms">Terms of Service</a>
-      </small>
-      <p class="mt-2"><small>© 2024 YouTube Earnings Estimator</small></p>
-    </footer>
-
-  </div>
-
-  <script>
-    const dm = document.getElementById('dm');
-    dm.onclick = () => {
-      const theme = document.documentElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-bs-theme', theme);
-      dm.textContent = theme === 'dark' ? '☀️' : '🌙';
-      localStorage.theme = theme;
-    };
-    window.onload = () => {
-      if (localStorage.theme) {
-        document.documentElement.setAttribute('data-bs-theme', localStorage.theme);
-        dm.textContent = localStorage.theme === 'dark' ? '☀️' : '🌙';
-      }
-    };
-  </script>
+  <footer class="footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+        <a href="{{ url_for('terms') }}">Terms of Service</a>
+        <a href="{{ url_for('contact') }}">Contact Us</a>
+      </nav>
+      <p class="copyright">&copy; {{ current_year }} {{ site_name }}. Not affiliated with YouTube or Google.</p>
+    </div>
+  </footer>
 </body>
 </html>
